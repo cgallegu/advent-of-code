@@ -1,0 +1,70 @@
+# Things we need to figure out given a board:
+# - Is it a winner?
+# - What's the sum of all unmarked numbers?
+#
+# If all numbers in any row or any column of a board are marked, that board wins.
+# We can have a set for each row and for each column.
+# As numbers get called, remove them from each row and column set.
+# If any of the sets are empty, then the board wins.
+#
+# To track unmarked numbers, we can have a set with all the numbers in the board.
+# As numbers get called, remove them from this set.
+# To get the score, iterate through all keys, adding them.
+#
+# # awk idioms (?)
+# ## sets
+# add item to set: `set[item] = ""`
+# remove item from set: `delete set[item]`
+# iterate set: `for item in set { ... }`
+#
+# ## data structures: board
+# - numbers: set with all numbers
+# - colrows["cols", i]: holds the i-th column
+# - colrows["rows", i]: holds the i-th row
+#
+# # File structure
+# called numbers, blank, board, blank, ...
+# We'll use the second line to switch the field separator
+# Boards have fixed width fields of size 3, except for the last one of size 2.
+# We can use https://www.gnu.org/software/gawk/manual/gawk.html#Fixed-width-data.
+# Maybe there's a way to specify one or more spaces as separator.
+# Looking at the docs (https://www.gnu.org/software/gawk/manual/gawk.html#Default-Field-Splitting), the default
+# separator is run of white spaces. FS = " " should do the trick.
+# 
+BEGIN { FS = "," }
+NR == 1 {
+    print "Reading called numbers"
+    # read called numbers
+    for (f = 1; f <= NF; f++) {
+        aCalled[f] = $f
+    }
+}
+NR == 2 { 
+    # switch field separator to space
+    FS = " "
+    # set board number to 1
+    nBoardNum = 1
+}
+NR >= 3 {
+    # boards
+    for (f = 1; f <= NF; f++) {
+        boardNums[nBoardNum, $f] = $f
+    }
+}
+
+NR >= 3 && $0 == "" {
+    nBoardNum++
+}
+END {
+    # increment board number
+    printf "Called numbers: "
+    for (i = 1; i <= length(aCalled); i++) {
+        printf "%s ", aCalled[i]
+    }
+
+    # remove called numbers from boards
+    f
+    #print ""
+    #printf "Board numbers: "
+    #for (num in boardNums) printf "%s ", boardNums[num]
+}

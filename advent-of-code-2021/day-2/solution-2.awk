@@ -1,0 +1,1 @@
+{ if ($1 == "down") aim += $2; if ($1 == "up") aim -= $2; if ($1 == "forward") { forward += $2;	depth += aim * $2 } } END { print "horizontal position:" forward, "depth:" depth; print "solution:" forward * depth }
